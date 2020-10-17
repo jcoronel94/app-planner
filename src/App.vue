@@ -3,7 +3,7 @@
     <nav class="navbar is-white topNav">
       <div class="container">
         <div class="navbar-brand">
-          <h1>Activity Planner</h1>
+          <h1>{{fullApp}}</h1>
         </div>
       </div>
     </nav>
@@ -60,7 +60,7 @@
 
               <div class="field is-grouped">
                 <div class="control">
-                  <button @click="createActivity" class="button is-link">Create Activity</button>
+                  <button :disabled="!isFormValid" @click="createActivity" class="button is-link">Create Activity</button>
                 </div>
                 <div class="control">
                   <button @click="toggleFormDisplay" class="button is-text">Cancel</button>
@@ -81,12 +81,15 @@
 
 <script>
 import ActivityItem from "@/components/ActivityItem";
-import { fetchActivities } from "@/api";
+import { fetchActivities, fetchUsers, fetchCategories } from "@/api";
 
 export default {
   name: "app",
   data() {
     return {
+      creator:'Jonathan',
+      appName:'Activity Planner',
+      watchedAppName:'Activity Planner by Jonathan',
       isFormDisplayed: false,
       message: "Hello Vue!",
       titleMessage: "Title Message Vue!!!!!",
@@ -96,15 +99,9 @@ export default {
         notes: ""
       },
       items: { 1: { name: "Filip" }, 2: { name: "John" } },
-      user: {
-        name: "Filip Jerga",
-        id: "-Aj34jknvncx98812"
-      },
+      user: {},
       activities: {},
-      categories: {
-        "1546969049": { text: "books" },
-        "1546969225": { text: "movies" }
-      }
+      categories: {}
     };
   },
   beforeCreate() {
@@ -112,26 +109,26 @@ export default {
   },
   created() {
     this.activities = fetchActivities();
+    this.categories = fetchCategories();
+    this.user = fetchUsers();
     console.log("created");
   },
-  beforeMount() {
-    console.log("beforeMount");
+  computed:{
+     isFormValid(){
+      return this.newActivity.title && this.newActivity.notes;
+    },
+    fullApp(){
+      return this.appName + " by " + this.creator
+    }
   },
-  mounted() {
-    console.log("mounted");
-  },
-  beforeUpdate() {
-    console.log("beforeUpdate");
-  },
-  updated() {
-    console.log("updated");
-  },
-  beforeDestroy() {
-    console.log("beforedestroy");
-  },
-  destroy() {
-    console.log("destroy");
-  },
+  // watcher:{
+  //   creator(value){
+  //     this.watchedAppName =  this.appName + " by " + value 
+  //   },
+  //   appName(value){
+  //        this.watchedAppName = value + " by " + this.creator
+  //   }
+  // },
   methods: {
     toggleTextDisplay() {
       this.isTextDisplayed = !this.isTextDisplayed;
