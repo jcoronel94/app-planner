@@ -65,7 +65,12 @@ export default {
     console.log("before");
   },
   created() {
-    this.activities = fetchActivities();
+    this.activities = fetchActivities()
+      .then((activities)=>{
+        this.activities=activities
+      }).catch(err=>{
+        console.log(err)
+      });
     this.categories = fetchCategories();
     this.user = fetchUsers();
     console.log("created");

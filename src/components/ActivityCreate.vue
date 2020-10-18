@@ -28,7 +28,7 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Notes</label>
+          <label class="label">Category</label>
 
           <div class="control">
             <select v-model="newActivity.category" class="select">
@@ -87,10 +87,15 @@ export default {
     toggleFormDisplay() {
       this.isFormDisplayed = !this.isFormDisplayed;
     },
+    resetActivity() {
+      this.newActivity = { title: "", notes: "", category: "" };
+      this.isFormDisplayed = false;
+    },
 
     createActivity() {
       console.log(this.newActivity);
-      createActivity(this.newActivity).then(activity => {
+      createActivity({ ...this.newActivity }).then(activity => {
+        this.resetActivity()
         this.$emit("activityCreated", { ...activity });
       });
     }
