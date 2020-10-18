@@ -1,5 +1,5 @@
 <template>
-  <div id="activityApp">
+  <div v-if="isDataLoaded" id="activityApp">
     <nav class="navbar is-white topNav">
       <div class="container">
         <div class="navbar-brand">
@@ -8,7 +8,7 @@
       </div>
     </nav>
 
-   <TheNavbar />
+    <TheNavbar />
 
     <section class="container">
       <div class="columns">
@@ -20,7 +20,12 @@
             <div v-if="error">{{error}}</div>
             <div v-else>
               <div v-if="isFetching">Loading...</div>
-              <ActivityItem v-for="activity in activities" :activity="activity" :key="activity.id"></ActivityItem>
+              <ActivityItem
+                v-for="activity in activities"
+                :activity="activity"
+                :categories="categories"
+                :key="activity.id"
+              ></ActivityItem>
             </div>
             <div v-if="!isFetching && !error">
               <div class="activity-length">Currently {{activityLength}} activities</div>
@@ -44,18 +49,13 @@ export default {
   name: "app",
   data() {
     return {
-      creator: "Jonathan",
+      creator: "Filip Jerga",
       appName: "Activity Planner",
-      watchedAppName: "Activity Planner by Jonathan",
-      message: "Hello Vue!",
-      titleMessage: "Title Message Vue!!!!!",
-      isTextDisplayed: true,
-      items: { 1: { name: "Filip" }, 2: { name: "John" } },
-      user: {},
-      activities: {},
-      categories: {},
+      isFetching: false,
       error: null,
-      isFetching: false
+      user: {},
+      activities: null,
+      categories: null
     };
   },
   beforeCreate() {
@@ -63,8 +63,7 @@ export default {
   },
   created() {
     this.isFetching = true;
-    this.activities = fetchActivities()
-      .then(activities => {
+    fetchActivities().then(activities => {
         this.activities = activities;
         this.isFetching = false;
       })
@@ -72,11 +71,18 @@ export default {
         this.isFetching = false;
         this.error = err;
       });
-    this.categories = fetchCategories();
+
+    fetchCategories().then(categories => {
+      this.categories = categories;
+    });
+
     this.user = fetchUsers();
     console.log("created");
   },
   computed: {
+    isDataLoaded() {
+      return this.activities && this.categories;
+    },
     activityLength() {
       return Object.keys(this.activities).length;
     },

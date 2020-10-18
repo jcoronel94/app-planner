@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "moment": "^2.29.1",
     "node-sass": "^4.14.1",
     "sass-loader": "^10.0.3",
     "vue": "^2.6.12"
@@ -35,7 +36,7 @@
       "vue/html-self-closing": 1,
       "no-console": 0,
       "no-unused-labels": "off",
-      "no-unused-vars":"off"
+      "no-unused-vars": "off"
     },
     "parserOptions": {
       "parser": "babel-eslint"

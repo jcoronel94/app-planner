@@ -35,7 +35,7 @@
               <option disabled value>Please select one</option>
               <option
                 :key="category.id"
-                value="category.id"
+                :value="category.id"
                 v-for="category in categories"
               >{{category.text}}</option>
             </select>
@@ -61,7 +61,7 @@
 
 
 <script>
-import { createActivity } from "@/api";
+import { createActivityAPI } from "@/api";
 
 export default {
   props: {
@@ -93,8 +93,9 @@ export default {
     },
 
     createActivity() {
-      console.log(this.newActivity);
-      createActivity({ ...this.newActivity }).then(activity => {
+  
+      createActivityAPI({ ...this.newActivity }).then(activity => {
+        console.log(activity)
         this.resetActivity()
         this.$emit("activityCreated", { ...activity });
       });
