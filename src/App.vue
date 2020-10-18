@@ -25,53 +25,13 @@
     <section class="container">
       <div class="columns">
         <div class="column is-3">
-          <a
-            v-if="!isFormDisplayed"
-            @click="toggleFormDisplay"
-            class="button is-primary is-block is-alt is-large"
-            href="#"
-          >New Activity</a>
-          <div v-if="isFormDisplayed" class="create-form">
-            <h2>Create Activity</h2>
-            <form>
-              <div class="field">
-                <label class="label">Title</label>
-                <div class="control">
-                  <input
-                    v-model="newActivity.title"
-                    class="input"
-                    type="text"
-                    placeholder="Read a Book"
-                  />
-                </div>
-              </div>
-
-              <div class="field">
-                <label class="label">Notes</label>
-
-                <div class="control">
-                  <textarea
-                    v-model="newActivity.notes"
-                    class="textarea"
-                    placeholder="Write some notes here"
-                  ></textarea>
-                </div>
-              </div>
-
-              <div class="field is-grouped">
-                <div class="control">
-                  <button :disabled="!isFormValid" @click="createActivity" class="button is-link">Create Activity</button>
-                </div>
-                <div class="control">
-                  <button @click="toggleFormDisplay" class="button is-text">Cancel</button>
-                </div>
-              </div>
-            </form>
-          </div>
+          <activity-create @activityCreated="addActivity" :categories="categories"></activity-create>
         </div>
         <div class="column is-9">
           <div class="box content">
             <ActivityItem v-for="activity in activities" :activity="activity" :key="activity.id"></ActivityItem>
+            <div class="activity-length">Currently {{activityLength}} activities</div>
+            <div class="activity-motivation">{{activityMotivation}}</div>
           </div>
         </div>
       </div>
@@ -81,23 +41,20 @@
 
 <script>
 import ActivityItem from "@/components/ActivityItem";
+import ActivityCreate from "@/components/ActivityCreate";
 import { fetchActivities, fetchUsers, fetchCategories } from "@/api";
+import Vue from 'vue';
 
 export default {
   name: "app",
   data() {
     return {
-      creator:'Jonathan',
-      appName:'Activity Planner',
-      watchedAppName:'Activity Planner by Jonathan',
-      isFormDisplayed: false,
+      creator: "Jonathan",
+      appName: "Activity Planner",
+      watchedAppName: "Activity Planner by Jonathan",
       message: "Hello Vue!",
       titleMessage: "Title Message Vue!!!!!",
       isTextDisplayed: true,
-      newActivity: {
-        title: "",
-        notes: ""
-      },
       items: { 1: { name: "Filip" }, 2: { name: "John" } },
       user: {},
       activities: {},
@@ -113,37 +70,33 @@ export default {
     this.user = fetchUsers();
     console.log("created");
   },
-  computed:{
-     isFormValid(){
-      return this.newActivity.title && this.newActivity.notes;
+  computed: {
+    activityLength() {
+      return Object.keys(this.activities).length;
     },
-    fullApp(){
-      return this.appName + " by " + this.creator
+    fullApp() {
+      return this.appName + " by " + this.creator;
+    },
+    activityMotivation() {
+      if (this.activityLength && this.activityLength < 5) {
+        return "Nice to see some goals";
+      } else if (this.activityLength >= 5) {
+        return "So many goals. Good job!";
+      } else {
+        return "No goals, so sad.";
+      }
     }
   },
-  // watcher:{
-  //   creator(value){
-  //     this.watchedAppName =  this.appName + " by " + value 
-  //   },
-  //   appName(value){
-  //        this.watchedAppName = value + " by " + this.creator
-  //   }
-  // },
-  methods: {
-    toggleTextDisplay() {
-      this.isTextDisplayed = !this.isTextDisplayed;
-    },
-
-    toggleFormDisplay() {
-      this.isFormDisplayed = !this.isFormDisplayed;
-    },
-
-    createActivity() {
-      console.log(this.newActivity);
+  methods:{
+     addActivity(newActivity) {
+   
+      Vue.set(this.activities, newActivity.id, newActivity)
+      console.log(newActivity);
     }
   },
   components: {
-    ActivityItem
+    ActivityItem,
+    ActivityCreate
   }
 };
 </script>
@@ -165,6 +118,14 @@ body {
 
 footer {
   background-color: #f2f6fa !important;
+}
+
+.activity-motivation {
+  float: right;
+}
+
+.activity-length {
+  display: inline-block;
 }
 
 .example-wrapper {
