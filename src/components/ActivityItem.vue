@@ -1,6 +1,9 @@
 <template>
   <article class="post">
-    <h4 class="title">{{ activity.title }}</h4>
+    <div class="activity-title-wrapper">
+      <h4 class="activity-title">{{ activity.title }}</h4>
+      <i @click="isMenuDisplayed=!isMenuDisplayed" class="fas fa-cog activity-settings" />
+    </div>
     <p>{{textUtility_capitilize(categories[activity.category].text)}}</p>
     <p>{{activity.notes}}</p>
     <div class="media">
@@ -26,14 +29,18 @@
         </span>
       </div>
     </div>
+    <div v-if="isMenuDisplayed" class="activity-control">
+      <a class="button is-warning">Edit</a>
+      <a @click = "deleteActivity" class="button is-danger">Delete</a>
+    </div>
   </article>
 </template>
 
 <script>
-
-import textUtility from '@/mixins/TextUtility'
+import textUtility from "@/mixins/TextUtility";
 
 export default {
+  mixins: [textUtility],
   props: {
     categories: {
       type: Object,
@@ -44,7 +51,11 @@ export default {
       required: true
     }
   },
-  mixins:[textUtility],
+  data() {
+    return {
+      isMenuDisplayed: false
+    };
+  },
   computed: {
     progressCheck() {
       const progress = this.activity.progress;
@@ -56,12 +67,17 @@ export default {
         return "green";
       }
     }
+  },
+  methods:{
+      deleteActivity(){
+          this.$emit('activityDeleted', this.activity)
+      }
   }
 };
 </script>
 
 
-<style scoped>
+<style lang="scss" scoped>
 .color-red {
   color: red;
 }
@@ -76,5 +92,26 @@ export default {
 
 .post .title {
   margin-bottom: 5px;
+}
+
+.activity-title {
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.activity-settings {
+  float: right;
+  font-size: 22px;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.activity-control {
+  margin: 20px 0 0 0;
+  a {
+    margin-right: 5px;
+  }
 }
 </style>

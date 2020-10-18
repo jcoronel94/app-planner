@@ -25,6 +25,7 @@
                 :activity="activity"
                 :categories="categories"
                 :key="activity.id"
+                @activityDeleted="handleActivityDelete"
               ></ActivityItem>
             </div>
             <div v-if="!isFetching && !error">
@@ -63,7 +64,8 @@ export default {
   },
   created() {
     this.isFetching = true;
-    fetchActivities().then(activities => {
+    fetchActivities()
+      .then(activities => {
         this.activities = activities;
         this.isFetching = false;
       })
@@ -103,6 +105,9 @@ export default {
     addActivity(newActivity) {
       Vue.set(this.activities, newActivity.id, newActivity);
       console.log(newActivity);
+    },
+    handleActivityDelete(activity) {
+      console.log(activity);
     }
   },
   components: {
