@@ -8,19 +8,7 @@
       </div>
     </nav>
 
-    <nav class="navbar is-white">
-      <div class="container">
-        <div class="navbar-menu">
-          <div class="navbar-start">
-            <a class="navbar-item is-active" href="#">Newest</a>
-
-            <a class="navbar-item" href="#">In Progress</a>
-
-            <a class="navbar-item" href="#">Finished</a>
-          </div>
-        </div>
-      </div>
-    </nav>
+   <TheNavbar />
 
     <section class="container">
       <div class="columns">
@@ -28,10 +16,16 @@
           <activity-create @activityCreated="addActivity" :categories="categories"></activity-create>
         </div>
         <div class="column is-9">
-          <div class="box content">
-            <ActivityItem v-for="activity in activities" :activity="activity" :key="activity.id"></ActivityItem>
-            <div class="activity-length">Currently {{activityLength}} activities</div>
-            <div class="activity-motivation">{{activityMotivation}}</div>
+          <div class="box content" :class="{fetching: isFetching ,'has-error':error}">
+            <div v-if="error">{{error}}</div>
+            <div v-else>
+              <div v-if="isFetching">Loading...</div>
+              <ActivityItem v-for="activity in activities" :activity="activity" :key="activity.id"></ActivityItem>
+            </div>
+            <div v-if="!isFetching && !error">
+              <div class="activity-length">Currently {{activityLength}} activities</div>
+              <div class="activity-motivation">{{activityMotivation}}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -41,9 +35,10 @@
 
 <script>
 import ActivityItem from "@/components/ActivityItem";
+import TheNavbar from "@/components/TheNavbar";
 import ActivityCreate from "@/components/ActivityCreate";
 import { fetchActivities, fetchUsers, fetchCategories } from "@/api";
-import Vue from 'vue';
+import Vue from "vue";
 
 export default {
   name: "app",
@@ -58,18 +53,24 @@ export default {
       items: { 1: { name: "Filip" }, 2: { name: "John" } },
       user: {},
       activities: {},
-      categories: {}
+      categories: {},
+      error: null,
+      isFetching: false
     };
   },
   beforeCreate() {
     console.log("before");
   },
   created() {
+    this.isFetching = true;
     this.activities = fetchActivities()
-      .then((activities)=>{
-        this.activities=activities
-      }).catch(err=>{
-        console.log(err)
+      .then(activities => {
+        this.activities = activities;
+        this.isFetching = false;
+      })
+      .catch(err => {
+        this.isFetching = false;
+        this.error = err;
       });
     this.categories = fetchCategories();
     this.user = fetchUsers();
@@ -92,16 +93,16 @@ export default {
       }
     }
   },
-  methods:{
-     addActivity(newActivity) {
-   
-      Vue.set(this.activities, newActivity.id, newActivity)
+  methods: {
+    addActivity(newActivity) {
+      Vue.set(this.activities, newActivity.id, newActivity);
       console.log(newActivity);
     }
   },
   components: {
     ActivityItem,
-    ActivityCreate
+    ActivityCreate,
+    TheNavbar
   }
 };
 </script>
@@ -127,6 +128,14 @@ footer {
 
 .activity-motivation {
   float: right;
+}
+
+.fetching {
+  border: 2px solid orange;
+}
+
+.has-error {
+  border: 2px solid red;
 }
 
 .activity-length {
