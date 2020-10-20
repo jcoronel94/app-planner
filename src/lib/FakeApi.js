@@ -33,8 +33,38 @@ const data = {
     }
 }
 
+const INITIAL_DATA = {
+    activities: {}
+}
+
 
 class FakeApi {
+
+
+    fillDB() {
+        this.commitData(data)
+    }
+
+    // initStore() {
+    //     const act = localStorage.getItem('activity_data')
+    //     if (!act) {
+    //         return INITIAL_DATA
+    //     }
+    //     else {
+    //         return JSON.parse(activityData)
+    //     }
+    // }
+
+    commitData(data) {
+        localStorage.setItem('activity_data', JSON.stringify(data))
+    }
+
+    getData() {
+        const activityData = localStorage.getItem('activity_data')
+        return JSON.parse(activityData)
+    }
+
+
     canContinue() {
 
         const rnNumber = Math.floor(Math.random() * 10)
@@ -49,13 +79,14 @@ class FakeApi {
     }) {
 
         return new Promise((resolve, reject) => {
-            this.asyncCall(()=>{
+            this.asyncCall(() => {
                 if (this.canContinue() || force) {
-                    resolve({...data[resource]})
+                    const data = this.getData()
+                    resolve({ ...data[resource] })
                 } else {
                     reject('Cannot fetch ' + resource)
                 }
-             })
+            })
         })
     }
 
@@ -63,14 +94,25 @@ class FakeApi {
     post(resource, item) {
 
         return new Promise((resolve, reject) => {
+            const data = this.getData()
             data[resource][item.id] = item
+            this.commitData(data)
+            resolve(item)
+        })
+    }
+
+    delete(resource, item) {
+        return new Promise((resolve, reject) => {
+            const data = this.getData()
+            delete data[resource][item.id]
+            this.commitData(data)
             resolve(item)
         })
     }
 
 
-    asyncCall(cb){
-        setTimeout(cb,500)
+    asyncCall(cb) {
+        setTimeout(cb, 500)
     }
 
 

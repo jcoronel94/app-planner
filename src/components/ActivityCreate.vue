@@ -5,14 +5,20 @@
       @click="toggleFormDisplay"
       class="button is-primary is-block is-alt is-large"
       href="#"
-    >New Activity</a>
+      >New Activity</a
+    >
     <div v-if="isFormDisplayed" class="create-form">
       <h2>Create Activity</h2>
       <form>
         <div class="field">
           <label class="label">Title</label>
           <div class="control">
-            <input v-model="newActivity.title" class="input" type="text" placeholder="Read a Book" />
+            <input
+              v-model="newActivity.title"
+              class="input"
+              type="text"
+              placeholder="Read a Book"
+            />
           </div>
         </div>
 
@@ -37,7 +43,9 @@
                 :key="category.id"
                 :value="category.id"
                 v-for="category in categories"
-              >{{category.text}}</option>
+              >
+                {{ category.text }}
+              </option>
             </select>
           </div>
         </div>
@@ -48,10 +56,14 @@
               :disabled="!isFormValid"
               @click.prevent="createActivity"
               class="button is-link"
-            >Create Activity</button>
+            >
+              Create Activity
+            </button>
           </div>
           <div class="control">
-            <button @click="toggleFormDisplay" class="button is-text">Cancel</button>
+            <button @click="toggleFormDisplay" class="button is-text">
+              Cancel
+            </button>
           </div>
         </div>
       </form>
@@ -61,7 +73,8 @@
 
 
 <script>
-import { createActivityAPI } from "@/api";
+
+import store from '@/store'
 
 export default {
   props: {
@@ -93,12 +106,15 @@ export default {
     },
 
     createActivity() {
-  
-      createActivityAPI({ ...this.newActivity }).then(activity => {
-        console.log(activity)
-        this.resetActivity()
-        this.$emit("activityCreated", { ...activity });
-      });
+          store.createActivity({...this.newActivity})
+          .then(activity =>{
+            this.resetActivity()
+            this.isFormDisplayed= false
+          })
+      // createActivityAPI({ ...this.newActivity }).then(activity => {
+    
+      
+      // });
     }
   },
   computed: {
